@@ -1,0 +1,73 @@
+﻿@model TravelBookingApp.Web.Models.HotelSearchViewModel
+@{
+    ViewData["Title"] = "Hotels";
+}
+
+<h2 class="mb-3">Find Hotels</h2>
+
+<!-- Search / Filter Form -->
+<form method="get" asp-action="Index" class="row g-3 mb-4 p-3 bg-light rounded">
+    <div class="col-md-4">
+        <label class="form-label">City</label>
+        <select asp-for="SearchCity" asp-items="Model.Cities" class="form-select">
+            <option value="">All Cities</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Max Price/Night (₹)</label>
+        <input type="number" name="maxPrice" value="@Model.MaxPrice"
+               class="form-control" placeholder="e.g. 5000" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Min Stars</label>
+        <select name="minStars" class="form-select">
+            <option value="">Any</option>
+            @for (int i = 1; i <= 5; i++)
+            {
+                <option value="@i" selected="@(Model.MinStars == i)">
+                    @i ★
+                </option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+</form>
+
+<!-- Hotel Cards -->
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var hotel in Model.Hotels)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">@hotel.Name</h5>
+                    <p class="text-muted mb-1">@hotel.City, @hotel.Country</p>
+                    <p class="text-warning mb-1">@hotel.Stars</p>
+                    <h4 class="text-success">@hotel.PriceDisplay
+                        <small class="text-muted fs-6">/night</small>
+                    </h4>
+                    <p class="text-muted small">
+                        @hotel.TotalBookings bookings so far
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Booking"
+                       asp-action="Create"
+                       asp-route-hotelId="@hotel.HotelId"
+                       class="btn btn-primary w-100">
+                        Book Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Hotels.Any())
+{
+    <div class="alert alert-warning mt-3">
+        No hotels found matching your criteria. Try adjusting your filters.
+    </div>
+}

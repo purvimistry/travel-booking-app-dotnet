@@ -1,0 +1,66 @@
+﻿@model TravelBookingApp.Web.Models.BookingCreateViewModel
+@{
+    ViewData["Title"] = "Edit Booking";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">Edit Booking</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label asp-for="HotelId" class="form-label">Hotel</label>
+                        <select asp-for="HotelId" asp-items="Model.Hotels" class="form-select">
+                            <option value="">-- Select Hotel --</option>
+                        </select>
+                        <span asp-validation-for="HotelId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CustomerId" class="form-label">Customer</label>
+                        <select asp-for="CustomerId" asp-items="Model.Customers" class="form-select">
+                            <option value="">-- Select Customer --</option>
+                        </select>
+                        <span asp-validation-for="CustomerId" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CheckedIn" class="form-label">Check-In Date</label>
+                            <input asp-for="CheckedIn" type="date" class="form-control" />
+                            <span asp-validation-for="CheckedIn" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CheckedOut" class="form-label">Check-Out Date</label>
+                            <input asp-for="CheckedOut" type="date" class="form-control" />
+                            <span asp-validation-for="CheckedOut" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NumberOfGuests" class="form-label">Number of Guests</label>
+                        <input asp-for="NumberOfGuests" type="number"
+                               min="1" max="10" class="form-control" />
+                        <span asp-validation-for="NumberOfGuests" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning">Save Changes</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

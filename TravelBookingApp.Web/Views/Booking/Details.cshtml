@@ -1,0 +1,82 @@
+﻿@model TravelBookingApp.Web.Models.BookingViewModel
+@{
+    ViewData["Title"] = "Booking Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <h5 class="mb-0">Booking #@Model.BookingId</h5>
+                <span class="badge @(Model.Status == "Confirmed" ? "bg-success" : "bg-danger") fs-6">
+                    @Model.Status
+                </span>
+            </div>
+            <div class="card-body">
+                <h6 class="text-muted mb-3">Hotel Information</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Hotel</dt>
+                    <dd class="col-sm-8">@Model.HotelName</dd>
+                    <dt class="col-sm-4">City</dt>
+                    <dd class="col-sm-8">@Model.HotelCity</dd>
+                </dl>
+
+                <hr />
+                <h6 class="text-muted mb-3">Customer Information</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Customer</dt>
+                    <dd class="col-sm-8">@Model.CustomerName</dd>
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@Model.CustomerEmail</dd>
+                </dl>
+
+                <hr />
+                <h6 class="text-muted mb-3">Stay Details</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Check-In</dt>
+                    <dd class="col-sm-8">@Model.CheckInDisplay</dd>
+                    <dt class="col-sm-4">Check-Out</dt>
+                    <dd class="col-sm-8">@Model.CheckOutDisplay</dd>
+                    <dt class="col-sm-4">Nights</dt>
+                    <dd class="col-sm-8">@Model.NumberOfNights</dd>
+                    <dt class="col-sm-4">Guests</dt>
+                    <dd class="col-sm-8">@Model.NumberOfGuests</dd>
+                    <dt class="col-sm-4">Total (INR)</dt>
+                    <dd class="col-sm-8 fw-bold text-success">₹@Model.TotalAmount.ToString("N0")</dd>
+                    <dt class="col-sm-4">Total (USD)</dt>
+                    <dd class="col-sm-8" id="usdAmount">
+                        <span class="spinner-border spinner-border-sm"></span> Loading...
+                    </dd>
+                    <dt class="col-sm-4">Booked On</dt>
+                    <dd class="col-sm-8">@Model.BookedOn.ToString("dd MMM yyyy, hh:mm tt")</dd>
+                </dl>
+            </div>
+            <div class="card-footer d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.BookingId"
+                   class="btn btn-warning btn-sm">Edit</a>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: 'https://localhost:7065/api/currency/convert',
+                type: 'GET',
+                data: { amount: @Model.TotalAmount, from: 'INR', to: 'USD' },
+                success: function (res) {
+                    $('#usdAmount').html(
+                        '<strong class="text-primary">$' + res.convertedAmount.toFixed(2) + '</strong>' +
+                        ' <small class="text-muted">(Rate: ' + res.conversionRate.toFixed(4) + ')</small>'
+                    );
+                },
+                error: function () {
+                    $('#usdAmount').text('Could not load');
+                }
+            });
+        });
+    </script>
+}

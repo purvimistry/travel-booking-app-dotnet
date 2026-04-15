@@ -1,0 +1,115 @@
+﻿@model TravelBookingApp.Web.Models.BookingCreateViewModel
+@{
+    ViewData["Title"] = "New Booking";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Create New Booking</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label asp-for="HotelId" class="form-label">Hotel</label>
+                        <select asp-for="HotelId"
+                                asp-items="Model.Hotels"
+                                class="form-select" id="hotelSelect">
+                            <option value="">-- Select Hotel --</option>
+                        </select>
+                        <span asp-validation-for="HotelId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CustomerId" class="form-label">Customer</label>
+                        <select asp-for="CustomerId"
+                                asp-items="Model.Customers"
+                                class="form-select">
+                            <option value="">-- Select Customer --</option>
+                        </select>
+                        <span asp-validation-for="CustomerId" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CheckedIn" class="form-label">Check-In Date</label>
+                            <input asp-for="CheckedIn" type="date"
+                                   class="form-control" id="checkIn" />
+                            <span asp-validation-for="CheckedIn" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CheckedOut" class="form-label">Check-Out Date</label>
+                            <input asp-for="CheckedOut" type="date"
+                                   class="form-control" id="checkOut" />
+                            <span asp-validation-for="CheckedOut" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NumberOfGuests" class="form-label">Number of Guests</label>
+                        <input asp-for="NumberOfGuests" type="number"
+                               min="1" max="10" class="form-control" />
+                        <span asp-validation-for="NumberOfGuests" class="text-danger"></span>
+                    </div>
+
+                    <!-- Live price estimate shown via JS -->
+                    <div id="priceEstimate" class="alert alert-info d-none">
+                        <strong>Estimated Total:</strong>
+                        <span id="estimatedPrice">₹0</span>
+                        <small class="ms-2 text-muted" id="nightsInfo"></small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            Confirm Booking
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Live price estimate when hotel + dates change
+        var hotelPrices = {};
+
+        // Load hotel prices on page load via API
+        $.get('https://localhost:7065/api/bookingapi', function() {});
+
+        // Simple price estimate using option text parsing
+        function updateEstimate() {
+            var selectedOption = $('#hotelSelect option:selected').text();
+            var checkIn  = new Date($('#checkIn').val());
+            var checkOut = new Date($('#checkOut').val());
+
+            if (!selectedOption || isNaN(checkIn) || isNaN(checkOut)) return;
+
+            var nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            if (nights <= 0) return;
+
+            // Extract price from option text e.g. "Hotel Name - City (₹4500/night)"
+            var match = selectedOption.match(/₹([\d,]+)\/night/);
+            if (!match) return;
+
+            var pricePerNight = parseFloat(match[1].replace(',', ''));
+            var total = nights * pricePerNight;
+
+            $('#estimatedPrice').text('₹' + total.toLocaleString('en-IN'));
+            $('#nightsInfo').text('(' + nights + ' nights × ₹' + pricePerNight + ')');
+            $('#priceEstimate').removeClass('d-none');
+        }
+
+        $('#hotelSelect, #checkIn, #checkOut').on('change', updateEstimate);
+    </script>
+}
