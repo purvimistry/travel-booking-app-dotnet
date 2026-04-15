@@ -37,5 +37,11 @@ A full-stack travel booking application built using **.NET 8** following **Clean
 ## Notes
 * API keys are removed for security
 * Static data used for demo purposes
+## Key Concepts Used
+- Clean Architecture
+- Repository Pattern
+- Dependency Injection
+- DTO & ViewModel separation
+- API Integration using HttpClient
 ## Author
 Purvi Mistry
